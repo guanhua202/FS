@@ -8,7 +8,6 @@
 # 	o По дате
 
 import os
-# from os import path
 import sys
 from time import sleep
 
