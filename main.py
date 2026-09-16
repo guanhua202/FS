@@ -1,18 +1,63 @@
 # ————— 🗂️ Органайзер файлов
-# 0. Принимать путь рабочей папки через sys.argv[1]
-# 1. Получить дату/расширение/размер подпапок
-# 2. Дать возможность выводить список подпапок
-# 3. Дать возможность отфильтровывать вывод подпапок по 3-м опциям: дата/расширение/размер
+# ✅ Принимать путь рабочей папки через sys.argv[1]
+# o 1. Получить дату/расширение/размер подпапок
+# ✅ Дать возможность выводить список подпапок
+# o 3. Дать возможность отфильтровывать вывод подпапок по 3-м опциям: дата/расширение/размер
+# 	✅ По расширению
+# 	o По размеру
+# 	o По дате
 
 import os
+# from os import path
+import sys
+from time import sleep
 
-path = 'My_Files/LA/log_analysis.py'
-size_bytes = os.path.getsize(path)
-size_KB = size_bytes / 1024
-print(size_KB)
+print('\n—————————— 🗂️ Органайзер файлов\n')
 
+path = sys.argv[1]
+text_ext = ['.txt', '.py', '.log', '.docx', '.doc', '.pdf', '.html']
 
+def default_sort(path):
+	print(f'Вы выбрали фильтрацию по типу из {path}')
+	sleep(0.5)
+	print('Ожидайте...')
 
+	dirs = sorted(os.listdir(path), key=lambda dir: os.path.splitext(dir)[-1])
+
+	for index, dir in enumerate(dirs):
+		sleep(1)
+		print(f"{index + 1}. {dir}")
+
+def dry_run(path):
+	print(f'Вы выбрали простой вывод файлов из {path}')
+	sleep(0.5)
+	print('Ожидайте...')
+
+	for index, dir in enumerate(os.listdir(path)):
+		# ext = os.path.splitext(dir)[-1]
+		sleep(1)
+		print(f"{index + 1}. {dir}")
+
+		# if ext in text_ext:
+		# 	print(f'Type: {ext}')
+		# else:
+		# 	print()
+
+def by_date(path):
+	print(f'Вы выбрали фильтрацию по дате из {path}')
+	sleep(0.5)
+	print('Ожидайте...')
+
+if sys.argv[-1] == path:
+	default_sort(path)
+else:
+	option = sys.argv[2]
+
+	if option == '--dry-run':
+		dry_run(path)
+
+	elif option == '--by date':
+		by_date(path)
 
 
 
