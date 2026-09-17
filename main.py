@@ -10,11 +10,13 @@
 import os
 import sys
 from time import sleep
+from time import ctime
 
 print('\n—————————— 🗂️ Органайзер файлов\n')
 
 path = sys.argv[1]
 text_ext = ['.txt', '.py', '.log', '.docx', '.doc', '.pdf', '.html']
+dirs = enumerate(os.listdir(path))
 
 def default_sort(path):
 	print(f'Вы выбрали фильтрацию по типу из {path}')
@@ -32,7 +34,7 @@ def dry_run(path):
 	sleep(0.5)
 	print('Ожидайте...')
 
-	for index, dir in enumerate(os.listdir(path)):
+	for index, dir in dirs:
 		# ext = os.path.splitext(dir)[-1]
 		sleep(1)
 		print(f"{index + 1}. {dir}")
@@ -42,10 +44,31 @@ def dry_run(path):
 		# else:
 		# 	print()
 
-def by_date(path):
+def by_date(unsorted_dirs, path):
 	print(f'Вы выбрали фильтрацию по дате из {path}')
 	sleep(0.5)
 	print('Ожидайте...')
+
+	def sum_hours(dir):
+		time = ctime(os.path.getmtime(dir)).split()
+		print(time)
+		input("...")
+
+		months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
+				  'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'
+				]
+
+		hours_year = ((time[4] * 365) * 24) # hours
+		hours_month = ((months.index(time[1]) + 1) * 30) * 24 # hours
+		hours_days = int(time[2]) * 24 # hours
+
+		return (hours_year * 60) + (hours_month * 60) + (hours_days * 60)
+
+	unsorted_dirs = sorted(unsorted_dirs, key=sum_hours)
+
+	for index, dir in unsorted_dirs:
+		sleep(1)
+		print(f"{index + 1}. {dir}")
 
 if sys.argv[-1] == path:
 	default_sort(path)
@@ -55,8 +78,8 @@ else:
 	if option == '--dry-run':
 		dry_run(path)
 
-	elif option == '--by date':
-		by_date(path)
+	elif option == '--by-date':
+		by_date(dirs, path)
 
 
 
