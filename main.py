@@ -1,5 +1,6 @@
 # ———————————————————— 🗂️ Органайзер файлов
-# o 2. Дать возможность выводить список подпапок
+# o Находить абсолютный путь ведённой папки
+# ✅ 2. Дать возможность выводить список подпапок
 # ✅ 3. Дать возможность отфильтровывать вывод подпапок по 3-м опциям: дата/расширение/размер
 	# 	✅ По расширению
 	# 	✅ По размеру
@@ -12,8 +13,17 @@ from time import ctime
 
 print('\n—————————————— 🗂️ Органайзер файлов\n')
 
-path = sys.argv[1]
-os.chdir(path)
+# path = sys.argv[1] # Format write: ~/FolderName/
+
+while os.path.exists(sys.argv[1]) == False:
+	os.chdir(os.environ['HOME'])
+	print("Write path not found.")
+
+	if input("Repeat? (Y/N): ") == 'Y':
+		sys.argv[1] = input("Write real path (Format write '~/FolderName/'): ")
+	else:
+		print('Bye')
+		sys.exit()
 
 files = os.listdir(path)
 
@@ -33,10 +43,14 @@ def default_sort(unsorted_files,path):
 
 def dry_run(unsorted_files, path):
 	display_text("умолчанию (беспорядочный вывод)", path)
-
+	total_dir = True
 	for index, file in enumerate(unsorted_files):
+		
 		sleep(1)
-		print(f"{index + 1}. {file}")
+		if os.path.isdir(file) and os.listdir(file) != []:
+			print(f"{index + 1}. {file} ———>", *os.listdir(file))
+		else:
+			print(f"{index + 1}. {file}")
 
 def by_date(unsorted_files, path):
 	display_text("ДАТЕ ИЗМЕНЕНИЯ", path)
@@ -64,7 +78,7 @@ def by_size(unsorted_files, path):
 
 	for index, file in enumerate(sort_files):
 		sleep(1)
-		print(f"{index + 1}. {file.ljust(len(max(sort_files, key=len)))} | {os.path.getsize(file)}B")
+		print(f"{index + 1}. {file.ljust(len(max(sort_files, key=len)))} | {round(os.path.getsize(file) / 1024, 2)}KB")
 
 def display_text(filter_name, path):
 	print(f'Вы выбрали фильтрацию по {filter_name} из {path}')
