@@ -2,8 +2,8 @@
 # ✅ Create dirs in main PATH
 # ✅ Move the photos to the Images folder and the videos to the Videos folder
 # ✅ Move the txt file to the TXT and the code to the Code folder
-# o Add function reset a last changes:
-# 	o 
+# o Create folder with name Day and Month file, and move the file his
+# o Add function reset a last changes
 
 import os
 import sys
@@ -27,7 +27,8 @@ while os.path.exists(sys.argv[1]) == False:
 else:
 	path = sys.argv[1]
 
-new_dirs = ['Images', 'Videos', 'TXT', 'Code']
+new_dirs = ['Dirs','Images', 'Videos', 'TXT', 'Code']
+
 files = os.listdir(path)
 os.chdir(path)
 
@@ -35,11 +36,8 @@ sys.argv.append('--type')
 
 mode = sys.argv[2]
 
-with open('before_last_changes.log', 'a+') as log_file:
-		for dir in files:
-			log_file.write(dir + " ")
-
 def default_sort(unsorted_files,path):
+
 	display_text("TYPE FILE", path)
 
 	files = sorted(unsorted_files, key=lambda file: os.path.splitext(file)[-1])
@@ -56,7 +54,9 @@ def default_sort(unsorted_files,path):
 	os.makedirs('Dirs', exist_ok=True)
 
 	for index, file in enumerate(files):
-		sleep(1)
+
+		sleep(0.5)
+
 		print(f"{index + 1}. {file.ljust(len(max(unsorted_files, key=len)))} | {'Dir' if os.path.splitext(file)[1] == '' else os.path.splitext(file)[1]	}")
 
 		if file not in new_dirs:
@@ -68,14 +68,16 @@ def default_sort(unsorted_files,path):
 				os.replace(file, f'TXT/{file}')
 			elif os.path.splitext(file)[1] in code and file != sys.argv[0]:
 				os.replace(file, f'Code/{file}')
-			elif os.path.splitext(file)[1] == '':
+			elif os.path.splitext(file)[1] == '' and os.path.splitext(file)[0] != '.git':
 				os.replace(file, f'Dirs/{file}')
 
 def dry_run(unsorted_files, path):
 	display_text("умолчанию (беспорядочный вывод)", path)
 
 	for index, file in enumerate(unsorted_files):
-		sleep(1)
+
+		sleep(0.5)
+
 		if os.path.isdir(file) and os.listdir(file) != []:
 			print(f"{index + 1}. {file} ———>", *os.listdir(file))
 		else:
@@ -111,6 +113,28 @@ def by_size(unsorted_files, path):
 		print(f"{index + 1}. {file.ljust(len(max(sort_files, key=len)))} | {round(os.path.getsize(file) / 1024, 2)}KB")
 
 def reset_last_changes(files, path):
+
+	paths = []
+
+	with open('before_last_changes.log') as file_path:
+		print(file_path)
+		paths = [line.replace('\n', ' ') for line in file_path.readlines()]
+
+	for index, dir in enumerate(new_dirs): # ['Dirs', 'Images', 'Videos', 'TXT', 'Code']
+		# last_path = os.getcwd()
+
+		if os.path.isdir(dir):
+			for file in os.listdir(dir):
+				
+				for f_path in paths:
+					f_path = f_path.replace(' ', '')
+					if os.path.split(f_path)[1] == file:
+						os.replace(os.path.abspath(file), f_path)
+
+			os.removedirs(dir)
+
+def display_text(filter_name, path):
+	print(f'You select sorted filter by {filter_name} in {path}')
 	screenshot = []
 
 	with open('before_last_changes.log') as log_file:
@@ -129,6 +153,7 @@ def reset_last_changes(files, path):
 
 def display_text(filter_name, path):
 	print(f'You select sorted filter by {filter_name} из {path}')
+
 	sleep(0.5)
 	print('One second...')
 
@@ -138,6 +163,13 @@ modes = {
 	'--by-date': by_date,
 	'--by-size': by_size,
 	'--reset-last-changes': reset_last_changes,
+
+	'-h': help,
+	'--help': help,
 }
 
 modes[mode](files, path)
+
+with open('before_last_changes.log', 'w') as log_file:
+	for file in files:
+		log_file.write(os.path.abspath(file) + "\n")
